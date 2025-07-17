@@ -127,7 +127,7 @@ def give_credit_scores(df):
         'active_days', 'deposit_usd', 'repay_usd'
     ]
     scaler = MinMaxScaler()
-    df_scaled = pd.DataFrame(scaler.fit(df[features]),columns=features)
+    df_scaled = pd.DataFrame(scaler.fit_transform(df[features]),columns=features)
 
     weights = {
         'tx_per_day': 0.10,
@@ -166,11 +166,11 @@ def vis_graph(df,image_file):
     plt.savefig(image_file)
 
 # function to write the analysis.md file
-def write_analysis(df,report_file):
+def write_analysis(df,report_file,image_file):
     with open(report_file, "w") as f:
         f.write("# Analysis of Given wallets\n")
         f.write("## Score Distribution\n")
-        f.write("![Distribution](wallet_score_distribution.png)\n\n")
+        f.write(f"![Distribution]({image_file})\n\n")
         f.write("## Summary\n")
         f.write(f"- Total wallets analyzed: {len(df)}\n")
         
@@ -198,18 +198,21 @@ def write_analysis(df,report_file):
 
 INPUT_JSON_FILE = "user-wallet-transactions.json"
 OUTPUT_CSV_FILE = "user-wallet-transactions.csv"
-CSV_FEATURES_FILE = "wallet_features.csv"
+FEATURES_FILE = "wallet_features.csv"
 DISTRIBUTION_GRAPH_FILE = "credit_score_distribution.png"
 ANALYSIS_FILE = "analysis.md"
 
 def main():
     converter(INPUT_JSON_FILE,OUTPUT_CSV_FILE)
     original_df = pd.read_csv(OUTPUT_CSV_FILE)
+    
     features_df = get_wallet_features(original_df) # get wallet features
-    features_df.to_csv(CSV_FEATURES_FILE,index=False) # save to csv file
-
-    give_credit_scores(features_df) # get the credit scores for the features    
+    features_df.to_csv(FEATURES_FILE,index=False) # save to csv file
+    
+    give_credit_scores(features_df) # get the credit scores for the features
+    
     vis_graph(features_df,DISTRIBUTION_GRAPH_FILE) # gets the graph distribution and save it to a png
-    write_analysis(features_df,ANALYSIS_FILE) # writes the markdown file with the analysis.
+
+    write_analysis(features_df,ANALYSIS_FILE,DISTRIBUTION_GRAPH_FILE) # writes the markdown file with the analysis.
 
 main()
