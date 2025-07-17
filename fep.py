@@ -77,8 +77,6 @@ def get_wallet_features(df: pd.DataFrame) -> pd.DataFrame:
             'asset_diversity': asset_diversity,
             'growth_ratio': growth_ratio,
             'liquidation_count': liquidation_count,
-            # Add action ratios - deposit/borrowing/redeemunderlying
-            **{f"action_ratio_{k}": v for k, v in actions.items()}
         }
 
         features.append(row)
