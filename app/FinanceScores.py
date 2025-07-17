@@ -151,7 +151,7 @@ def give_credit_scores(df):
     df_scaled['credit_score'] = ((df_scaled['raw_credit_score']-min_score)/(max_score-min_score))*1000
     df['credit_score'] = df_scaled['credit_score']
 
-# function to plot the distribution of wallets
+# function to plot the distribution graph
 def vis_graph(df,image_file):
     bins = list(range(0,1100,100))
     labels = [f"{b}-{b+99}" for b in bins[:-1]]
@@ -165,6 +165,7 @@ def vis_graph(df,image_file):
     plt.tight_layout()
     plt.savefig(image_file)
 
+# function to write the analysis.md file
 def write_analysis(df,report_file):
     with open(report_file, "w") as f:
         f.write("# Analysis of Given wallets\n")
@@ -198,7 +199,7 @@ def write_analysis(df,report_file):
 INPUT_JSON_FILE = "user-wallet-transactions.json"
 OUTPUT_CSV_FILE = "user-wallet-transactions.csv"
 CSV_FEATURES_FILE = "wallet_features.csv"
-DISTRIBUTION_GRAPH = "credit_score_distribution.png"
+DISTRIBUTION_GRAPH_FILE = "credit_score_distribution.png"
 ANALYSIS_FILE = "analysis.md"
 
 def main():
@@ -206,11 +207,11 @@ def main():
     original_df = pd.read_csv(OUTPUT_CSV_FILE)
     
     features_df = get_wallet_features(original_df) # get wallet features
-    features_df.to_csv(CSV_FEATURES_FILE,index=False) # convert them into a csv file
+    features_df.to_csv(CSV_FEATURES_FILE,index=False) # save to csv file
     
     give_credit_scores(features_df) # get the credit scores for the features
     
-    vis_graph(features_df,DISTRIBUTION_GRAPH) # gets the graph distribution and save it to a png
+    vis_graph(features_df,DISTRIBUTION_GRAPH_FILE) # gets the graph distribution and save it to a png
 
     write_analysis(features_df,ANALYSIS_FILE) # writes the markdown file with the analysis.
 
