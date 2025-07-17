@@ -41,33 +41,17 @@ def converter(json_file:str,csv_file:str):
 
 # get the wallet features
 def get_wallet_features(df: pd.DataFrame) -> pd.DataFrame:
-    token_decimals = {
-        'USDC': 6,
-        'USDT': 6,
-        'DAI': 18,
-        'WETH': 18,
-        'WBTC': 8,
-        'WMATIC': 18,
-        'AAVE': 18,
-        'WPOL': 18
-    }
 
-    # 2. Convert to proper amount
+    # convert to proper amount
     df['amount'] = pd.to_numeric(df['amount'], errors='coerce')
     df['assetPriceUSD'] = pd.to_numeric(df['assetPriceUSD'], errors='coerce')
 
-    def convert_amount(row):
-        symbol = row['assetSymbol']
-        decimals = token_decimals.get(symbol, 18) # if nan value found, then it gets replaced by 18(default value)
-        return row['amount'] / (10 ** decimals)
+    df['usd_value'] = df['amount'] * df['assetPriceUSD']
 
-    df['amount_converted'] = df.apply(convert_amount, axis=1)
-    df['usd_value'] = df['amount_converted'] * df['assetPriceUSD']
-
-    # 3. Convert timestamp to datetime
+    # convert timestamp to datetime
     df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
 
-    # 4. Group by userWallet
+    # group by userWallet
     grouped = df.groupby('userWallet')
 
     features = []
@@ -176,8 +160,8 @@ def write_analysis(df,report_file,image_file):
         
         perfect_score_count = (df["credit_score"] == 1000).sum()
         zero_score_count = (df["credit_score"] == 0).sum()
-        f.write(f"Number of wallets with perfect credit score (1000): {perfect_score_count}\n\n")
-        f.write(f"Number of wallets with zero credit score (0):{zero_score_count}\n\n")
+        f.write(f"- Number of wallets with perfect credit score (1000) : {perfect_score_count}\n\n")
+        f.write(f"- Number of wallets with zero credit score (0) : {zero_score_count}\n\n")
 
         top_wallets = df.sort_values(by="credit_score", ascending=False).head(3)
         f.write("## Top 3 Wallets by Credit Score\n")
